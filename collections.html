@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Collections — ROKEA by RK</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Poppins:wght@300;400;500;600;700&family=Great+Vibes&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile.css">
+  <!-- Razorpay SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-analytics-compat.js"></script>
+</head>
+
+<body class="collections-page">
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img
+        src="https://static.wixstatic.com/media/9881b8_16e714ef67304ad7812d38944b0b0b16~mv2.png/v1/crop/x_0,y_92,w_5000,h_1065/fill/w_155,h_33,fp_0.50_0.50,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/ROKEA%20horizontal%20logo%20(1).png"
+        alt="ROKEA by RK" class="logo-img">
+    </a>
+    <div class="menu-toggle" onclick="toggleMobileMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#products">Products</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+      <li id="userLinkCont"><a href="javascript:void(0)" onclick="openAuth()" id="navLogin">Login / Register</a></li>
+    </ul>
+    <div class="nav-actions" style="display: flex; gap: 20px; align-items: center;">
+      <div class="wishlist-trigger" onclick="toggleWishlist()"
+        style="position: relative; cursor: pointer; margin-right: 20px;">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" style="width: 24px; height: 24px;">
+          <path
+            d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+        </svg>
+        <span id="wish-count" class="cart-count"
+          style="position: absolute; top: -5px; right: -10px; background: #e91e63; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 50%;">0</span>
+      </div>
+      <div class="cart-trigger" onclick="toggleCart()" style="position: relative; cursor: pointer;">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" style="width: 24px; height: 24px;">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+          <path d="M3 6h18" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>
+        <span id="cart-count" class="cart-count"
+          style="position: absolute; top: -5px; right: -10px; background: var(--gold); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 50%;">0</span>
+      </div>
+      <button class="nav-cta" onclick="openAuth()">Book Appointment</button>
+    </div>
+  </nav>
+
+  <!-- MAIN PRODUCTS SECTION -->
+  <section class="products-section" id="products" style="padding-top: 150px;">
+    <div class="featured-inner">
+      
+      <div class="back-to-cats" onclick="location.href='index.html#products'"
+        style="cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 30px; color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; width: fit-content;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" style="width: 16px; height: 16px;">
+          <path d="M19 12H5" />
+          <path d="M12 19l-7-7 7-7" />
+        </svg>
+        Back to Collections
+      </div>
+
+      <div class="featured-top"
+        style="flex-direction: column; align-items: center; text-align: center; margin-bottom: 40px;">
+        <span class="section-label">Our Heritage</span>
+        <h2 class="section-title">The ROKEA by RK <em>Boutique</em></h2>
+
+        <!-- Product Tabs -->
+        <div class="product-tabs-wrapper" style="display: flex; justify-content: center; align-items: center; gap: 30px; margin-top: 40px; border-bottom: 1px solid rgba(201,168,76,0.2); padding-bottom: 15px; width: 100%; flex-wrap: wrap;">
+          <div class="product-tabs"
+            style="display: flex; gap: 30px; justify-content: center;">
+            <div class="tab-item active" onclick="switchCategory('sarees')" data-cat="sarees">Sarees</div>
+            <div class="tab-item" onclick="switchCategory('imitation')" data-cat="imitation">Imitation Jewellery</div>
+          </div>
+          
+          <div class="sort-wrapper">
+            <select id="price-sort" onchange="applySort(this.value)" class="premium-select">
+              <option value="default">Sort by: Default</option>
+              <option value="low">Price: Low to High</option>
+              <option value="high">Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Single Grid that changes content -->
+      <div class="products-grid" id="main-product-grid">
+        <!-- Dynamically populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="contact">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo">
+          <img
+            src="https://static.wixstatic.com/media/9881b8_16e714ef67304ad7812d38944b0b0b16~mv2.png/v1/crop/x_0,y_92,w_5000,h_1065/fill/w_155,h_33,fp_0.50_0.50,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/ROKEA%20horizontal%20logo%20(1).png"
+            alt="ROKEA by RK" class="logo-img">
+        </a>
+        <p class="footer-tagline">Coimbatore's finest destination for luxury handwoven sarees and heritage jewellery,
+          celebrating the art of Indian craftsmanship since 2010.</p>
+        <div class="footer-social">
+          <div class="social-btn" title="Facebook"
+            onclick="window.open('https://www.facebook.com/rokeabyrk/', '_blank')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" style="width: 18px; height: 18px;">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+          </div>
+          <div class="social-btn" title="Instagram"
+            onclick="window.open('https://www.instagram.com/rokeabyrk/', '_blank')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" style="width: 18px; height: 18px;">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html#home">Home</a></li>
+          <li><a href="index.html#about">Our Heritage</a></li>
+          <li><a href="index.html#stylist">AI Virtual Stylist</a></li>
+          <li><a href="index.html#instagram-hub">Social Hub</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Visit Us</div>
+        <ul class="footer-links">
+          <li><a href="https://maps.google.com/?q=Sanganoor+road,+Rathinapuri+post,+Coimbatore-641027"
+              target="_blank">Sanganoor road, Rathinapuri post, Coimbatore-641027</a></li>
+          <li><a href="tel:+917010394051">+91 7010394051</a></li>
+          <li><a href="mailto:rokeabyrk@gmail.com">rokeabyrk@gmail.com</a></li>
+          <li style="margin-top: 15px;"><button class="btn-primary" style="padding: 8px 15px; font-size: 12px;"
+              onclick="openAuth()">Book Appointment</button></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 ROKEA by RK Luxury Sarees & Jewellery. All rights reserved.</span>
+      <div class="footer-pay">
+        <span class="pay-badge">UPI</span>
+        <span class="pay-badge">Visa</span>
+        <span class="pay-badge">Mastercard</span>
+        <span class="pay-badge">EMI</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- AUTH MODAL (LOGIN/REGISTER) -->
+  <div class="modal" id="authModal">
+    <div class="modal-content" style="max-width: 400px;">
+      <span class="modal-close" onclick="closeAuth()">&times;</span>
+      <div id="loginView">
+        <span class="section-label">Welcome Back</span>
+        <h3 style="margin-bottom: 20px; font-family: 'Playfair Display', serif; font-size: 28px;">Sign In</h3>
+        <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="your@email.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="******"></div>
+        <button class="btn-primary" style="width:100%" onclick="handleAuth()">Login</button>
+        <p style="margin-top:20px; font-size:12px; color:var(--muted)">Don't have an account? <a href="javascript:void(0)" onclick="toggleAuth(false)" style="color:var(--gold)">Register</a></p>
+      </div>
+      <div id="registerView" style="display:none">
+        <span class="section-label">Join ROKEA by RK</span>
+        <h3 style="margin-bottom: 20px; font-family: 'Playfair Display', serif; font-size: 28px;">New Account</h3>
+        <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="John Doe"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="your@email.com"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="regPhone" placeholder="9876543210"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="regPass" placeholder="******"></div>
+        <button class="btn-primary" style="width:100%" onclick="handleRegister()">Sign Up</button>
+        <p style="margin-top:20px; font-size:12px; color:var(--muted)">Already have an account? <a href="javascript:void(0)" onclick="toggleAuth(true)" style="color:var(--gold)">Login</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- WISHLIST MODAL -->
+  <div id="wishlistModal" class="modal">
+    <div class="modal-content side-drawer" style="background: var(--ivory);">
+      <span class="modal-close" onclick="toggleWishlist()">&times;</span>
+      <h2 class="section-title">Your <em>Wishlist</em></h2>
+      <div id="wishlist-items" class="cart-items-list" style="margin-top: 30px;"></div>
+      <div class="cart-footer" style="margin-top: 30px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px;">
+        <button class="btn-primary w-full" style="width: 100%;" onclick="moveAllToCart()">Move All to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOPPING CART MODAL -->
+  <div id="cartModal" class="modal">
+    <div class="modal-content side-drawer">
+      <span class="modal-close" onclick="toggleCart()">&times;</span>
+      <h2 class="section-title">Your <em>Cart</em></h2>
+      <div id="cart-items" class="cart-items-list" style="margin-top: 30px;"></div>
+      <div class="cart-footer" style="margin-top: 30px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+          <span style="font-weight: 600;">Total Amount:</span>
+          <span id="cart-total" style="color: var(--gold); font-weight: 700; font-size: 1.2rem;">₹0</span>
+        </div>
+        <button class="btn-primary w-full" style="width: 100%;" onclick="openCheckout()">Proceed to Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT MODAL -->
+  <div id="checkoutModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeCheckout()">&times;</span>
+      <h2 class="section-title">Delivery <em>Details</em></h2>
+      <form id="checkoutForm" onsubmit="handleOrder(event)" style="margin-top: 30px;">
+        <div class="form-group"><label>Full Name</label><input type="text" id="orderName" required></div>
+        <div class="form-group"><label>PhoneNumber</label><input type="tel" id="orderPhone" required></div>
+        <div class="form-group"><label>Full Address</label><textarea id="orderAddress" required style="width: 100%; height: 100px;"></textarea></div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Confirm & Pay</button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- FULL STORY MODAL -->
+  <div class="modal" id="storyModal">
+    <div class="modal-content" style="max-width: 800px; line-height: 2.2;">
+      <span class="modal-close" onclick="closeFullStory()">&times;</span>
+      <span class="section-label">Since 2010</span>
+      <h2 class="section-title">The ROKEA <em>Chronicles</em></h2>
+      <div style="margin-top: 40px; color: var(--text); font-size: 15px;">
+        <p style="margin-bottom: 25px;">
+          It was a quiet morning in the weavers' colonies of Coimbatore in 2010 when ROKEA was born. We saw more than
+          just silk; we saw the history of families, the rhythm of looms that had been singing the same song for
+          centuries.
+        </p>
+        <p style="margin-bottom: 25px;">
+          Every ROKEA saree starts months before it reaches our boutique. It begins with the careful selection of
+          mulberry silk and the pure gold zari of Kanchipuram. We work directly with master weavers, ensuring that the
+          'Handloom Mark' is not just a certification, but a promise of authenticity.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTOMATIC LEAD CAPTURE POPUP -->
+  <div class="modal" id="leadModal">
+    <div class="modal-content lead-popup-content">
+      <span class="modal-close" onclick="closeLeadModal()">&times;</span>
+      <div class="lead-split">
+        <div class="lead-image" style="background-image: url('luxury_red_saree.png')"></div>
+        <div class="lead-form-container">
+          <span class="section-label">Exclusive Access</span>
+          <h2 class="section-title" style="font-size: 32px; margin-bottom: 10px;">Book a <em>Style</em> Session</h2>
+          <p style="font-size: 13px; color: var(--muted); margin-bottom: 25px; line-height: 1.6;">
+            Receive a complimentary styling consultation with our master designers.
+          </p>
+          <form id="leadForm" onsubmit="handleLead(event)">
+            <div class="form-group"><label>Full Name</label><input type="text" id="leadName" required></div>
+            <div class="form-group"><label>Phone / WhatsApp</label><input type="tel" id="leadPhone" required></div>
+            <button type="submit" class="btn-primary" style="width: 100%;">Request Consultation</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE MENU -->
+  <div id="mobileMenu" class="mobile-menu">
+    <div class="mobile-menu-header">
+      <a href="index.html" class="nav-logo">
+        <img src="https://static.wixstatic.com/media/9881b8_16e714ef67304ad7812d38944b0b0b16~mv2.png/v1/crop/x_0,y_92,w_5000,h_1065/fill/w_155,h_33,fp_0.50_0.50,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/ROKEA%20horizontal%20logo%20(1).png" alt="ROKEA by RK" class="logo-img">
+      </a>
+      <span class="menu-close" onclick="toggleMobileMenu()">&times;</span>
+    </div>
+    <ul class="mobile-nav-links">
+      <li><a href="index.html#about" onclick="toggleMobileMenu()">About</a></li>
+      <li><a href="index.html#products" onclick="toggleMobileMenu()">Products</a></li>
+      <li><a href="index.html#contact" onclick="toggleMobileMenu()">Contact</a></li>
+    </ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
