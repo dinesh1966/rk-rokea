@@ -1014,7 +1014,7 @@ setTimeout(() => {
     leadModal.style.display = 'flex';
     sessionStorage.setItem('leadShown', 'true');
   }
-}, 3000);
+}, 8000);
 
 window.closeLeadModal = () => {
   const modal = document.getElementById('leadModal');
