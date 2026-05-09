@@ -17,8 +17,6 @@
   --maroon: #6B1C2E;
   --text: #3A2A10;
   --muted: #7A6A50;
-  --text: #3A2A10;
-  --muted: #7A6A50;
 }
 
 @keyframes rotateBorder {
@@ -201,14 +199,17 @@ nav {
   background: var(--gold);
   padding: 10px 22px;
   border: none;
+  border-radius: 50px;
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
-  font-weight: 500;
-  transition: background 0.3s;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .nav-cta:hover {
   background: var(--gold-light);
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(201, 168, 76, 0.3);
 }
 
 .menu-toggle,
@@ -341,37 +342,43 @@ nav {
   color: var(--dark);
   padding: 16px 40px;
   border: none;
+  border-radius: 50px;
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 3px;
   text-transform: uppercase;
-  transition: background 0.3s, transform 0.2s;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: 0 4px 15px rgba(201, 168, 76, 0.2);
 }
 
 .btn-primary:hover {
   background: var(--gold-light);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(201, 168, 76, 0.4);
 }
 
 .btn-outline {
   background: transparent;
   color: #fff;
   padding: 16px 40px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50px;
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 3px;
   text-transform: uppercase;
-  transition: border-color 0.3s, color 0.3s;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .btn-outline:hover {
   border-color: var(--gold);
   color: var(--gold);
+  background: rgba(201, 168, 76, 0.05);
+  transform: translateY(-3px);
 }
 
 .hero-scroll {
@@ -2835,9 +2842,4 @@ td {
   background: var(--ivory);
   color: var(--text);
   padding: 10px;
-}
-  font-size: 14px;
-  line-height: 1.8;
-  color: #444;
-  text-align: justify;
 }
