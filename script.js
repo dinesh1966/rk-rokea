@@ -68,9 +68,29 @@ products = products.map(p => {
     id: p.id || Date.now() + Math.random(),
     image: p.image || p.img,
     imageHover: p.imageHover || p.imgHover || p.image || p.img,
-    productCare: care
+    productCare: care,
+    // Prioritize price from description if found, otherwise keep existing
+    price: Number(extractPriceFromDesc(p.description)) || Number(p.price) || 0
   };
 });
+
+function extractPriceFromDesc(desc) {
+  if (!desc) return 0;
+  // Look for currency symbols or labels
+  const priceMatch = desc.match(/(?:₹|Rs\.?|Price|Rate|Cost)\D*([\d,]+)/i);
+  if (priceMatch) {
+    const val = parseInt(priceMatch[1].replace(/,/g, ''));
+    return isNaN(val) ? 0 : val;
+  }
+  // Look for any 3-6 digit number that isn't part of another word
+  const numbers = desc.match(/\b\d[\d,]{2,6}\b/g);
+  if (numbers) {
+    // Pick the largest number found as it's most likely the price
+    const values = numbers.map(n => parseInt(n.replace(/,/g, ''))).filter(v => v > 100);
+    if (values.length > 0) return Math.max(...values);
+  }
+  return 0;
+}
 localStorage.setItem('saforio_products', JSON.stringify(products));
 
 let cart = JSON.parse(localStorage.getItem('saforio_cart')) || [];
@@ -687,7 +707,7 @@ function renderMarquee() {
 
   let content = displayProducts.map(p => `
     <span class="marquee-item" onclick="openProductDetail(${p.id})" style="cursor:pointer">
-      ${p.name} <span class="marquee-dot"></span>
+      ${p.name} <span class="marquee-price" style="color:#fff; margin-left: 5px; opacity: 0.9;">— ₹${(extractPriceFromDesc(p.description) || p.price || 0).toLocaleString('en-IN')}</span> <span class="marquee-dot"></span>
     </span>
   `).join('');
 
@@ -722,11 +742,13 @@ function renderGrid() {
           <svg class="wish-icon-svg" viewBox="0 0 24 24" fill="${inWishlist ? '#e91e63' : 'none'}" stroke="${inWishlist ? '#e91e63' : '#fff'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
         </div>
       </div>
-      <div class="product-info" style="display: flex; flex-direction: column; flex-grow: 1;">
-        <div class="product-type">${p.category.toUpperCase()}</div>
-        <h3 class="product-name">${p.name}</h3>
-        <div class="product-price"><span class="price-main">₹${p.price}</span></div>
-        <button class="btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="event.stopPropagation(); addToCart(${p.id})" ${p.stock === "Out of Stock" ? 'disabled' : ''}>
+      <div class="product-info" style="display: flex; flex-direction: column; flex-grow: 1; padding: 15px;">
+        <div class="product-price" style="display: block !important; margin-bottom: 8px;">
+          <span class="price-main" style="color: var(--gold-dark); font-weight: 700; font-size: 18px;">₹${(extractPriceFromDesc(p.description) || p.price || 0).toLocaleString('en-IN')}</span>
+        </div>
+        <div class="product-type" style="font-size: 10px; color: var(--muted); text-transform: uppercase;">${p.category.toUpperCase()}</div>
+        <h3 class="product-name" style="margin: 5px 0 15px 0;">${p.name}</h3>
+        <button class="btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: auto;" onclick="event.stopPropagation(); addToCart(${p.id})" ${p.stock === "Out of Stock" ? 'disabled' : ''}>
           ${p.stock === "Out of Stock" ? 'Sold Out' : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Add to Cart`}
         </button>
       </div>
@@ -765,7 +787,7 @@ function renderAdminList() {
       <div class="admin-img" style="width:40px;height:40px;border-radius:4px;flex-shrink:0; background:url('${p.image || p.img}') center/cover"></div>
       <div class="admin-item-info">
         <div style="font-size:12px; font-weight:600;">${p.name}</div>
-        <div style="font-size:10px; color:var(--muted)">${p.category} • ₹${p.price.toLocaleString()} • ${p.stock.toUpperCase()}</div>
+        <div style="font-size:10px; color:var(--muted)">${p.category} • ₹${p.price.toLocaleString('en-IN')} • ${p.stock.toUpperCase()}</div>
       </div>
       <div class="admin-item-actions">
         <button class="admin-btn btn-edit" onclick="editProduct(${idx})">Edit</button>
@@ -798,6 +820,11 @@ if (productForm) {
       description: document.getElementById('prodDesc').value,
       productCare: document.getElementById('prodCare').value
     };
+    // Sync price from description if present
+    const extractedPrice = extractPriceFromDesc(newProd.description);
+    if (extractedPrice > 0) {
+      newProd.price = extractedPrice;
+    }
     if (editIndex > -1) {
       newProd.id = products[editIndex].id;
       products[editIndex] = newProd;
@@ -890,8 +917,8 @@ function renderRelatedProducts(category, currentId) {
          <div style="position: absolute; top: 12px; left: 12px; border: 1px solid rgba(0,0,0,0.3); color: #222; padding: 4px 14px; font-size: 10px; border-radius: 20px; background: rgba(255,255,255,0.85); display: ${idx % 3 === 0 ? 'none' : 'block'}">Best Seller</div>
       </div>
       <div style="padding: 16px 15px; display: flex; flex-direction: column; flex-grow: 1;">
+         <div style="font-size: 13px; color: var(--gold-dark); font-weight: 700; margin-bottom: 8px;">₹${(extractPriceFromDesc(p.description) || p.price || 0).toLocaleString('en-IN')}</div>
          <div style="font-family: 'Poppins', sans-serif; font-size: 11px; color: #444; text-transform: uppercase; margin-bottom: 12px; font-weight: 500; letter-spacing: 0px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; height: 33px;">${p.name}</div>
-         <div style="font-size: 13px; color: #111; font-weight: 600; margin-top: auto;">₹${p.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
       </div>
     </div>`).join('');
 }
@@ -1233,10 +1260,12 @@ function renderRecommendations(selected, tone = "") {
         <img src="${p.image || p.img}" class="img-main" style="width:100%; height:100%; object-fit:cover;">
         <img src="${p.imageHover || p.imgHover || p.image || p.img}" class="img-hover" style="width:100%; height:100%; object-fit:cover;">
       </div>
-      <div style="font-size:9px; color:var(--gold); text-transform: uppercase; letter-spacing:1px; margin-bottom: 5px;">${p.category}</div>
-      <h3 class="product-name" style="font-family:'Playfair Display',serif; font-size:15px; color:var(--dark); margin:0 auto 5px; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</h3>
-      <div style="color:var(--gold); font-weight:600; font-size: 14px;">₹${p.price.toLocaleString()}</div>
-      <div style="font-size: 10px; margin-top: 10px; color: var(--muted); font-style: italic;">Perfect for you</div>
+      <div style="padding: 15px; text-align: center;">
+        <div style="color:var(--gold-dark); font-weight:700; font-size: 14px; margin-bottom: 5px;">₹${(extractPriceFromDesc(p.description) || p.price || 0).toLocaleString('en-IN')}</div>
+        <div style="font-size:9px; color:var(--gold); text-transform: uppercase; letter-spacing:1px; margin-bottom: 5px;">${p.category}</div>
+        <h3 class="product-name" style="font-family:'Playfair Display',serif; font-size:15px; color:var(--dark); margin:0 auto 5px; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</h3>
+        <div style="font-size: 10px; margin-top: 10px; color: var(--muted); font-style: italic;">Perfect for you</div>
+      </div>
     </div>`).join('');
 }
 
@@ -1295,7 +1324,7 @@ function initProductPage(productId) {
     breadCat.innerText = p.category;
     breadCat.href = `collections.html?category=${p.category}`;
   }
-  if (price) price.innerText = `₹${p.price.toLocaleString()}`;
+  if (price) price.innerText = `₹${(extractPriceFromDesc(p.description) || p.price || 0).toLocaleString('en-IN')}`;
 
   if (desc) {
     const descText = p.description || "Exquisite premium collection from ROKEA by RK.";
