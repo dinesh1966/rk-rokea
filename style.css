@@ -958,12 +958,15 @@ section {
   gap: 8px;
   margin-bottom: 12px;
   margin-top: auto;
+  border-top: 1px solid rgba(201, 168, 76, 0.1);
+  padding-top: 10px;
 }
 
 .price-main {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--dark);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold-dark);
+  letter-spacing: 0.5px;
 }
 
 .price-old {
