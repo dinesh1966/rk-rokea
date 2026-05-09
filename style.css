@@ -34,6 +34,7 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -41,7 +42,82 @@ body {
   background: var(--cream);
   color: var(--text);
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
+
+/* ── SPLASH SCREEN ── */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--dark);
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.8s ease;
+}
+
+.splash-content {
+  text-align: center;
+}
+
+.splash-logo-img {
+  height: clamp(60px, 12vw, 120px);
+  width: auto;
+  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center center;
+}
+
+.splash-screen.scrolled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── SPLASH SCROLL INDICATOR ── */
+.splash-scroll-indicator {
+  position: absolute;
+  bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  opacity: 0.8;
+  animation: fadeIn 2s ease forwards;
+  transition: opacity 0.5s ease;
+}
+
+.splash-scroll-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.splash-scroll-mouse {
+  width: 24px;
+  height: 38px;
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.splash-scroll-wheel {
+  width: 3px;
+  height: 8px;
+  background: var(--gold);
+  border-radius: 2px;
+  margin-top: 6px;
+  animation: scrollWheel 2s infinite cubic-bezier(0.15, 0.41, 0.69, 0.94);
+}
+
+@keyframes scrollWheel {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(12px); opacity: 0; }
+}
+
 
 /* ── NAV ── */
 nav {
