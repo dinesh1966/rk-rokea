@@ -1414,3 +1414,80 @@ renderAll();
 updateCartIcon();
 updateWishlistIcon();
 updateUserUI();
+
+// =============================================
+// SPLASH SCREEN LOGIC
+// =============================================
+document.addEventListener('DOMContentLoaded', () => {
+  const splashScreen = document.getElementById('splashScreen');
+  const splashLogo = document.getElementById('splashLogo');
+  const navLogoImg = document.getElementById('navLogoImg');
+  
+  if (splashScreen && splashLogo && navLogoImg) {
+    if (document.getElementById('home')) {
+      navLogoImg.style.opacity = '0';
+      navLogoImg.style.transition = 'opacity 0.5s ease'; 
+      
+      // Strictly prevent scrolling before and during animation
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      
+      let splashDone = false;
+      
+      const preventScroll = (e) => {
+        if (!splashDone) e.preventDefault();
+      };
+      
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventScroll, { passive: false });
+      
+      const handleSplash = (e) => {
+        if (splashDone) return;
+        
+        if (e.type === 'wheel' && e.deltaY <= 0) return;
+        
+        splashDone = true;
+        
+        // Hide scroll indicator immediately
+        const scrollInd = splashScreen.querySelector('.splash-scroll-indicator');
+        if (scrollInd) scrollInd.style.opacity = '0';
+        
+        const navRect = navLogoImg.getBoundingClientRect();
+        const logoRect = splashLogo.getBoundingClientRect();
+        
+        const xTranslate = navRect.left + (navRect.width/2) - (logoRect.left + logoRect.width/2);
+        const yTranslate = navRect.top + (navRect.height/2) - (logoRect.top + logoRect.height/2);
+        const scale = navRect.width / logoRect.width;
+        
+        splashLogo.style.transform = `translate(${xTranslate}px, ${yTranslate}px) scale(${Math.max(scale, 0.2)})`;
+        
+        // Wait for the logo to reach the destination
+        setTimeout(() => {
+          splashLogo.style.opacity = '0';
+          navLogoImg.style.transition = 'opacity 0.5s ease';
+          navLogoImg.style.opacity = '1';
+          splashScreen.classList.add('scrolled');
+          
+          // Restore scrolling only after the splash background is gone
+          setTimeout(() => {
+            document.documentElement.style.overflow = '';
+            document.body.style.overflow = '';
+            window.removeEventListener('wheel', preventScroll);
+            window.removeEventListener('touchmove', preventScroll);
+          }, 800);
+        }, 950);
+        
+        window.removeEventListener('wheel', handleSplash);
+        window.removeEventListener('touchmove', handleSplash);
+        window.removeEventListener('touchstart', handleSplash);
+      };
+      
+      window.addEventListener('wheel', handleSplash, { passive: false });
+      window.addEventListener('touchmove', handleSplash, { passive: false });
+      window.addEventListener('touchstart', handleSplash, { passive: false });
+    } else {
+      splashScreen.style.display = 'none';
+      navLogoImg.style.opacity = '1';
+    }
+  }
+});
