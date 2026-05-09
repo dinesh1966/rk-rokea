@@ -1300,22 +1300,55 @@ function initProductPage(productId) {
   if (desc) {
     const descText = p.description || "Exquisite premium collection from ROKEA by RK.";
     const descLines = descText.split('\n').filter(line => line.trim().length > 0);
-    desc.innerHTML = descLines.map(line => `
-      <div class="desc-item">
-        <span class="desc-icon">✦</span>
-        <div class="desc-text">${line.trim()}</div>
+    desc.innerHTML = `<div style="display: flex; flex-direction: column; gap: 15px;">` + descLines.map(line => `
+      <div style="background: rgba(255,255,255,0.7); border-left: 3px solid var(--gold); padding: 15px 20px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; color: var(--text); box-shadow: 0 2px 10px rgba(0,0,0,0.02); transition: transform 0.3s; cursor: default;" onmouseover="this.style.transform='translateX(3px)';" onmouseout="this.style.transform='translateX(0)';">
+        ${line.replace(/^[✦•\-\*]\s*/, '').trim()}
       </div>
-    `).join('');
+    `).join('') + `</div>`;
   }
   
   if (care) {
     const careText = p.productCare || "Handle with care to maintain the longevity of this premium piece.";
     const items = careText.split('\n').filter(line => line.trim().length > 0);
-    care.innerHTML = items.map(item => {
-      const text = item.replace(/✦\s*/, '').trim();
-      if (text === "CARE & SAFETY") return `<div style="font-weight:600; margin-bottom:15px; color:var(--dark); font-size:12px; letter-spacing:1.2px; text-transform:uppercase;">${text}</div>`;
-      return `<div class="care-item"><span class="care-icon">✦</span><div class="care-text">${text}</div></div>`;
-    }).join('');
+    
+    let html = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; margin-top: 10px;">`;
+    
+    items.forEach(item => {
+      const text = item.replace(/^[✦•\-\*]\s*/, '').trim();
+      if (text === "CARE & SAFETY") return;
+      
+      let title = "Care Tip";
+      let descText = text;
+      
+      if(text.includes(':')) {
+         const parts = text.split(':');
+         title = parts[0].trim();
+         descText = parts.slice(1).join(':').trim();
+      }
+      
+      let iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+      if(title.toLowerCase().includes('clean')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>`;
+      if(title.toLowerCase().includes('water') || title.toLowerCase().includes('moisture')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
+      if(title.toLowerCase().includes('stor')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>`;
+      if(title.toLowerCase().includes('perfume') || title.toLowerCase().includes('chemical')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M10 2v4M14 2v4M6 10v10a2 2 0 002 2h8a2 2 0 002-2V10a2 2 0 00-2-2H8a2 2 0 00-2 2z"/></svg>`;
+      if(title.toLowerCase().includes('handl')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>`;
+      if(title.toLowerCase().includes('longevity') || title.toLowerCase().includes('tip')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+      
+      html += `
+        <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(201,168,76,0.15); border-radius: 8px; padding: 18px; display: flex; flex-direction: column; gap: 10px; transition: transform 0.3s, box-shadow 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 5px 15px rgba(201,168,76,0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 2px;">
+            <div style="background: rgba(201,168,76,0.1); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(201,168,76,0.05);">
+               ${iconSvg}
+            </div>
+            <div style="font-family: 'Playfair Display', serif; font-weight: 600; font-size: 15px; color: var(--dark); letter-spacing: 0.3px;">${title}</div>
+          </div>
+          <div style="font-size: 13px; line-height: 1.6; color: var(--text);">${descText}</div>
+        </div>
+      `;
+    });
+    
+    html += `</div>`;
+    care.innerHTML = html;
   }
 
   if (stock) {
