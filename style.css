@@ -112,8 +112,15 @@ body {
 }
 
 @keyframes scrollWheel {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(12px); opacity: 0; }
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
 }
 
 
@@ -147,7 +154,8 @@ nav {
   flex-shrink: 0;
 }
 
-.wishlist-trigger, .cart-trigger {
+.wishlist-trigger,
+.cart-trigger {
   position: relative;
   cursor: pointer;
   display: flex;
@@ -950,6 +958,11 @@ section {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.marquee-item {
+  text-transform: uppercase;
 }
 
 .product-price {
@@ -1882,6 +1895,15 @@ footer {
   cursor: pointer;
   font-size: 24px;
   color: var(--dark);
+}
+
+.product-name {
+  font-size: 12px;
+  height: 34px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  color: var(--dark);
+  text-transform: uppercase;
 }
 
 .form-group {
