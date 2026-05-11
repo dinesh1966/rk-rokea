@@ -29,7 +29,17 @@ const JEWELLERY_CARE_INSTRUCTIONS = `CARE & SAFETY
 ✦	Stone Care: Do not scrub stone-set pieces. Wipe stone surfaces with a cotton swab to maintain shine.
 ✦	Longevity Tip: Occasional light polish with a soft cloth keeps the finish bright. Store separately to avoid scratches.`;
 
+const PREMIUM_PRODUCTS = [
+  { id: 1001, name: "Premium soft silk saree", category: 'sarees', price: 24500, image: 'premium_soft_silk_saree.png', imageHover: 'luxury_red_saree.png', description: "Exquisite handwoven soft silk saree with premium finish.", productCare: "Dry clean only. Store in a cool, dry place.", stock: "In Stock" },
+  { id: 1002, name: "Dubion saree", category: 'sarees', price: 12800, image: 'dubion_saree.png', imageHover: 'emerald_green_saree.png', description: "Elegant Dubion silk saree for a sophisticated look.", productCare: "Dry clean only. Store in a cool, dry place.", stock: "In Stock" },
+  { id: 1003, name: "Glow Viscose saree", category: 'sarees', price: 8500, image: 'glow_viscose_saree.png', imageHover: 'luxury_red_saree.png', description: "Radiant Viscose saree with a beautiful glow.", productCare: "Dry clean only. Store in a cool, dry place.", stock: "In Stock" },
+  { id: 1004, name: "White stone necklace", category: 'imitation', price: 4200, image: 'white_stone_necklace.png', imageHover: 'saforio_instagram_jewel_1.png', description: "Classic white stone necklace for any occasion.", productCare: JEWELLERY_CARE_INSTRUCTIONS, stock: "In Stock" },
+  { id: 1005, name: "Deep wine floral necklace", category: 'imitation', price: 5800, image: 'deep_wine_floral_necklace.png', imageHover: 'temple_jewellery_set.png', description: "Beautiful deep wine floral necklace with intricate details.", productCare: JEWELLERY_CARE_INSTRUCTIONS, stock: "In Stock" },
+  { id: 1006, name: "Antique gold coin necklace with Lakshmi pendant", category: 'imitation', price: 15500, image: 'antique_gold_coin_necklace.png', imageHover: 'temple_jewellery_set.png', description: "Traditional antique gold coin necklace with a Lakshmi pendant.", productCare: JEWELLERY_CARE_INSTRUCTIONS, stock: "In Stock" }
+];
+
 const defaultProducts = [
+  ...PREMIUM_PRODUCTS,
   ...Array.from({ length: 20 }, (_, i) => ({
     id: i + 1,
     name: `Kanjivaram Silk Saree ${i + 1}`,
@@ -91,7 +101,16 @@ function extractPriceFromDesc(desc) {
   }
   return 0;
 }
+// Ensure premium products are always at the top and present
+const existingNames = products.map(p => p.name.toLowerCase());
+PREMIUM_PRODUCTS.forEach(pp => {
+  if (!existingNames.includes(pp.name.toLowerCase())) {
+    products.unshift(pp);
+  }
+});
+
 localStorage.setItem('saforio_products', JSON.stringify(products));
+
 
 let cart = JSON.parse(localStorage.getItem('saforio_cart')) || [];
 let wishlist = JSON.parse(localStorage.getItem('saforio_wishlist')) || [];
@@ -702,17 +721,23 @@ function renderMarquee() {
   const track = document.getElementById('marquee-track');
   if (!track) return;
 
-  // Show up to 15 products in the marquee
-  const displayProducts = products.slice(0, 15);
+  const marqueeProductNames = [
+    "Premium soft silk saree",
+    "Dubion saree",
+    "Glow Viscose saree",
+    "White stone necklace",
+    "Deep wine floral necklace",
+    "Antique gold coin necklace with Lakshmi pendant"
+  ];
 
-  let content = displayProducts.map(p => `
-    <span class="marquee-item" onclick="openProductDetail(${p.id})" style="cursor:pointer">
-      ${p.name} <span class="marquee-price" style="color:#fff; margin-left: 5px; opacity: 0.9;">— ₹${(extractPriceFromDesc(p.description) || p.price || 0).toLocaleString('en-IN')}</span> <span class="marquee-dot"></span>
+  let content = marqueeProductNames.map(name => `
+    <span class="marquee-item">
+      ${name} <span class="marquee-dot"></span>
     </span>
   `).join('');
 
   // Duplicate for seamless loop
-  track.innerHTML = content + content;
+  track.innerHTML = content + content + content;
 }
 
 // =============================================
@@ -1335,34 +1360,34 @@ function initProductPage(productId) {
       </div>
     `).join('') + `</div>`;
   }
-  
+
   if (care) {
     const careText = p.productCare || "Handle with care to maintain the longevity of this premium piece.";
     const items = careText.split('\n').filter(line => line.trim().length > 0);
-    
+
     let html = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; margin-top: 10px;">`;
-    
+
     items.forEach(item => {
       const text = item.replace(/^[✦•\-\*]\s*/, '').trim();
       if (text === "CARE & SAFETY") return;
-      
+
       let title = "Care Tip";
       let descText = text;
-      
-      if(text.includes(':')) {
-         const parts = text.split(':');
-         title = parts[0].trim();
-         descText = parts.slice(1).join(':').trim();
+
+      if (text.includes(':')) {
+        const parts = text.split(':');
+        title = parts[0].trim();
+        descText = parts.slice(1).join(':').trim();
       }
-      
+
       let iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
-      if(title.toLowerCase().includes('clean')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>`;
-      if(title.toLowerCase().includes('water') || title.toLowerCase().includes('moisture')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
-      if(title.toLowerCase().includes('stor')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>`;
-      if(title.toLowerCase().includes('perfume') || title.toLowerCase().includes('chemical')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M10 2v4M14 2v4M6 10v10a2 2 0 002 2h8a2 2 0 002-2V10a2 2 0 00-2-2H8a2 2 0 00-2 2z"/></svg>`;
-      if(title.toLowerCase().includes('handl')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>`;
-      if(title.toLowerCase().includes('longevity') || title.toLowerCase().includes('tip')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
-      
+      if (title.toLowerCase().includes('clean')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>`;
+      if (title.toLowerCase().includes('water') || title.toLowerCase().includes('moisture')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
+      if (title.toLowerCase().includes('stor')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>`;
+      if (title.toLowerCase().includes('perfume') || title.toLowerCase().includes('chemical')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M10 2v4M14 2v4M6 10v10a2 2 0 002 2h8a2 2 0 002-2V10a2 2 0 00-2-2H8a2 2 0 00-2 2z"/></svg>`;
+      if (title.toLowerCase().includes('handl')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>`;
+      if (title.toLowerCase().includes('longevity') || title.toLowerCase().includes('tip')) iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+
       html += `
         <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(201,168,76,0.15); border-radius: 8px; padding: 18px; display: flex; flex-direction: column; gap: 10px; transition: transform 0.3s, box-shadow 0.3s; cursor: default;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 5px 15px rgba(201,168,76,0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 2px;">
@@ -1375,7 +1400,7 @@ function initProductPage(productId) {
         </div>
       `;
     });
-    
+
     html += `</div>`;
     care.innerHTML = html;
   }
@@ -1445,7 +1470,7 @@ window.switchDetailImage = (index) => {
       mainImg.style.opacity = '1';
     }, 200);
   }
-  
+
   // Update thumbs
   document.querySelectorAll('.thumb-item').forEach((thumb, i) => {
     thumb.classList.toggle('active', i === index);
@@ -1484,52 +1509,52 @@ document.addEventListener('DOMContentLoaded', () => {
   const splashScreen = document.getElementById('splashScreen');
   const splashLogo = document.getElementById('splashLogo');
   const navLogoImg = document.getElementById('navLogoImg');
-  
+
   if (splashScreen && splashLogo && navLogoImg) {
     if (document.getElementById('home')) {
       navLogoImg.style.opacity = '0';
-      navLogoImg.style.transition = 'opacity 0.5s ease'; 
-      
+      navLogoImg.style.transition = 'opacity 0.5s ease';
+
       // Strictly prevent scrolling before and during animation
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
-      
+
       let splashDone = false;
-      
+
       const preventScroll = (e) => {
         if (!splashDone) e.preventDefault();
       };
-      
+
       window.addEventListener('wheel', preventScroll, { passive: false });
       window.addEventListener('touchmove', preventScroll, { passive: false });
-      
+
       const handleSplash = (e) => {
         if (splashDone) return;
-        
+
         if (e.type === 'wheel' && e.deltaY <= 0) return;
-        
+
         splashDone = true;
-        
+
         // Hide scroll indicator immediately
         const scrollInd = splashScreen.querySelector('.splash-scroll-indicator');
         if (scrollInd) scrollInd.style.opacity = '0';
-        
+
         const navRect = navLogoImg.getBoundingClientRect();
         const logoRect = splashLogo.getBoundingClientRect();
-        
-        const xTranslate = navRect.left + (navRect.width/2) - (logoRect.left + logoRect.width/2);
-        const yTranslate = navRect.top + (navRect.height/2) - (logoRect.top + logoRect.height/2);
+
+        const xTranslate = navRect.left + (navRect.width / 2) - (logoRect.left + logoRect.width / 2);
+        const yTranslate = navRect.top + (navRect.height / 2) - (logoRect.top + logoRect.height / 2);
         const scale = navRect.width / logoRect.width;
-        
+
         splashLogo.style.transform = `translate(${xTranslate}px, ${yTranslate}px) scale(${Math.max(scale, 0.2)})`;
-        
+
         // Wait for the logo to reach the destination
         setTimeout(() => {
           splashLogo.style.opacity = '0';
           navLogoImg.style.transition = 'opacity 0.5s ease';
           navLogoImg.style.opacity = '1';
           splashScreen.classList.add('scrolled');
-          
+
           // Restore scrolling only after the splash background is gone
           setTimeout(() => {
             document.documentElement.style.overflow = '';
@@ -1538,12 +1563,12 @@ document.addEventListener('DOMContentLoaded', () => {
             window.removeEventListener('touchmove', preventScroll);
           }, 800);
         }, 950);
-        
+
         window.removeEventListener('wheel', handleSplash);
         window.removeEventListener('touchmove', handleSplash);
         window.removeEventListener('touchstart', handleSplash);
       };
-      
+
       window.addEventListener('wheel', handleSplash, { passive: false });
       window.addEventListener('touchmove', handleSplash, { passive: false });
       window.addEventListener('touchstart', handleSplash, { passive: false });
